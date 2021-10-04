@@ -2,6 +2,7 @@ import cv2
 import zmq 
 import json 
 import numpy as np 
+import multiprocessing as mp 
 
 from libraries.log import logger 
 from libraries.strategies import * 
@@ -10,12 +11,13 @@ from tqdm import tqdm
 from os import getenv, path 
 
 class ZMQImageMatcher:
-    def __init__(self, source, target, server_port, threshold, shape):
+    def __init__(self, source, target, server_port, threshold, shape, nb_workers):
         self.server_port = server_port 
         self.shape = shape 
         self.source = source 
         self.target = target 
         self.threshold = threshold 
+        self.nb_workers = nb_workers
         self.matcher = cv2.BFMatcher()
         self.extractor = cv2.SIFT_create()
     
@@ -50,6 +52,20 @@ class ZMQImageMatcher:
                 valid_matches = valid_matches + 1 
         return valid_matches
 
+    def find_duplicates(self, accumulator, src_descriptor, src_keypoints, path2neighbors):
+        for target in path2neighbors:
+            trg_image = read_image(target, size=self.shape)
+            trg_keypoints, trg_descriptor = self.get_sift(trg_image)
+            trg_descriptor = self.turn_sift2mbrsift(trg_descriptor)
+            
+            matching_weight = self.compare_descriptors(src_descriptor, trg_descriptor)
+            matching_weight /= (2 * np.maximum(len(src_keypoints), len(trg_keypoints)))
+            
+            if matching_weight > 0.1:
+                _, target_name = path.split(target)
+                accumulator.put({'image_id': target_name, 'score': matching_weight})
+        # end mbr-sift loop processing 
+
     def start(self):
         INITIALIZED = False  
         try:
@@ -72,23 +88,32 @@ class ZMQImageMatcher:
                             path2candidate = path.join(self.source, loaded_message['candidate'])
                             path2neighbors = [ path.join(self.target, elm) for elm in loaded_message['neighbors']]
 
+                            neighbors_chunks = np.split(path2neighbors, self.nb_workers)
+
                             src_image = read_image(path2candidate, size=self.shape)
                             src_keypoints, src_descriptor = self.get_sift(src_image)
                             src_descriptor = self.turn_sift2mbrsift(src_descriptor)
+                            
+
+                            accumulator = mp.Queue()
+                            worker_array = []
+                            for idx in range(self.nb_workers):
+                                worker = mp.Process(
+                                    target=self.find_duplicates, 
+                                    args=(accumulator, src_descriptor, src_keypoints, neighbors_chunks[idx])
+                                )
+                                worker.start()
+                                worker_array[worker_array]
+                            
+                            for wrk in worker_array:
+                                wrk.join()
 
                             retained = []
-                            for target in tqdm(path2neighbors):
-                                trg_image = read_image(target, size=self.shape)
-                                trg_keypoints, trg_descriptor = self.get_sift(trg_image)
-                                trg_descriptor = self.turn_sift2mbrsift(trg_descriptor)
-                                
-                                matching_weight = self.compare_descriptors(src_descriptor, trg_descriptor)
-                                matching_weight /= (2 * np.maximum(len(src_keypoints), len(trg_keypoints)))
-                                
-                                if matching_weight > 0.1:
-                                    _, target_name = path.split(target)
-                                    retained.append({'image_id': target_name, 'score': matching_weight})
-                            
+                            while not accumulator.empty():
+                                retained.append(
+                                    accumulator.get()
+                                )
+
                             response = json.dumps({
                                 'global_status': 1,
                                 'error_message': '', 
