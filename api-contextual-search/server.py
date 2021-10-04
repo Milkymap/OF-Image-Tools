@@ -90,19 +90,27 @@ class ZMQNGT:
                             decoded_request = json.loads(remote_request.decode())
                             nb_neighbors = decoded_request['nb_neighbors']
                             vec_features = decoded_request['vec_features']
-                            ngt_response = self.engine.search(vec_features, nb_neighbors)
-                            positions, distances = list(zip(*ngt_response))
-                            selected_candidates = op.itemgetter(*positions)(self.idx2img_id)    
-                            zipped_solutions = list(zip(selected_candidates, distances))
-                            mapped_solutions = [ {'path': itm[0], 'score': itm[1]} for itm in zipped_solutions ]
-                            response2send = json.dumps({
-                                'global_status': 1, 
-                                'error_message': '',
-                                'response': {
-                                    'local_status': 1, 
-                                    'neighbors': mapped_solutions
-                                }
-                            }).encode()
+                            if len(vec_features) != self.dimension:
+                                logger.error(f'the required dim is {self.dimension}')
+                                response2send = json.dumps({
+                                    'global_status': 0, 
+                                    'error_message': f'dimension mismatch : required : {self.dimension}',
+                                    'response': {}
+                                }).encode()
+                            else:
+                                ngt_response = self.engine.search(vec_features, nb_neighbors)
+                                positions, distances = list(zip(*ngt_response))
+                                selected_candidates = op.itemgetter(*positions)(self.idx2img_id)    
+                                zipped_solutions = list(zip(selected_candidates, distances))
+                                mapped_solutions = [ {'path': itm[0], 'score': itm[1]} for itm in zipped_solutions ]
+                                response2send = json.dumps({
+                                    'global_status': 1, 
+                                    'error_message': '',
+                                    'response': {
+                                        'local_status': 1, 
+                                        'neighbors': mapped_solutions
+                                    }
+                                }).encode()
                         except Exception as e:
                             logger.error(f'an error occurs during request handler {e}')
                             response2send = json.dumps({
