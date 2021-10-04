@@ -53,11 +53,11 @@ ENV INDEX='index/'
 ENV DISTANCE_TYPE='Cosine'
 ENV DIMENSION=512
 ENV BATCH_SIZE=5000
-ENV ROUTER_PORT=8800
+ENV SERVER_PORT=8800
 ENV FEATURES_LOCATION='location/'
 
 # expose zmq server port 
-EXPOSE $ROUTER_PORT
+EXPOSE $SERVER_PORT
 
 # entrypoint
 CMD ["python", "server.py"]

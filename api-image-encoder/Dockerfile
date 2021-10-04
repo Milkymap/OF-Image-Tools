@@ -13,18 +13,19 @@ RUN apt-get update --fix-missing && \
          ffmpeg libsm6 libxext6 libpcre3 libpcre3-dev
 
 # define new user 
-RUN useradd --gid root --home-dir /usr/local/descriptor --create-home descriptor  
-WORKDIR /usr/local/descriptor
+RUN useradd --gid root --create-home solver 
+WORKDIR /home/solver
+
 COPY . ./
 
 # define new virutal environment 
 ENV VIRTUAL_ENV=/opt/venv
-RUN chmod -R g+rwx /usr/local/descriptor && \
+RUN chmod -R g+rwx /home/solver && \
     python -m venv $VIRTUAL_ENV --system-site-packages
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # upgrade and install pip 
-RUN pip install --upgrade pip && pip install loguru 
+RUN pip install --upgrade pip && pip install loguru pyzmq opencv-python tqdm  
 
 # usefull environments 
 ENV MODELS_PATH='models/'

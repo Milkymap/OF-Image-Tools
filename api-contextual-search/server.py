@@ -127,7 +127,7 @@ def main():
     INDEX = getenv('INDEX')
     DIMENSION = int(getenv('DIMENSION'))
     BATCH_SIZE = int(getenv('BATCH_SIZE'))
-    ROUTER_PORT = int(getenv('ROUTER_PORT'))
+    ROUTER_PORT = int(getenv('SERVER_PORT'))
     DISTANCE_TYPE = getenv('DISTANCE_TYPE')
     FEATURES_LOCATION = getenv('FEATURES_LOCATION')
     
