@@ -124,7 +124,7 @@ class ZMQImageMatcher:
                                     'duplicated': retained
                                 }
                             }).encode()
-                            logger.success(f'server finishs the searching process : ({end - begin} s)')
+                            logger.success(f'the [MBR-SIFT] searching process took : ({end - begin} s)')
                         except Exception as e:
                             logger.error(f'an error occurs during instance matching {e}')
                             response = json.dumps({
