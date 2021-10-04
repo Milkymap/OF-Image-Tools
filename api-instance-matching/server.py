@@ -88,7 +88,7 @@ class ZMQImageMatcher:
                             path2candidate = path.join(self.source, loaded_message['candidate'])
                             path2neighbors = [ path.join(self.target, elm) for elm in loaded_message['neighbors']]
 
-                            neighbors_chunks = np.split(path2neighbors, self.nb_workers)
+                            neighbors_chunks = np.split(np.asarray(path2neighbors), self.nb_workers)
 
                             src_image = read_image(path2candidate, size=self.shape)
                             src_keypoints, src_descriptor = self.get_sift(src_image)
@@ -100,7 +100,7 @@ class ZMQImageMatcher:
                             for idx in range(self.nb_workers):
                                 worker = mp.Process(
                                     target=self.find_duplicates, 
-                                    args=(accumulator, src_descriptor, src_keypoints, neighbors_chunks[idx])
+                                    args=(accumulator, src_descriptor, src_keypoints, neighbors_chunks[idx].tolist())
                                 )
                                 worker.start()
                                 worker_array[worker_array]
