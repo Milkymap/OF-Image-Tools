@@ -27,7 +27,7 @@ a python implementation of ngt, resnet vectorization and mbr-sift for image dupl
         --rm 
         --name contextual-search
         -v path2embeddings:/home/solver/location
-        -e ROUTER_PORT=8800
+        -e SERVER_PORT=8800
         -e BATCH_SIZE=1024
         -e DIMENSION=512
         -e DISTANCE_TYPE=Cosine
