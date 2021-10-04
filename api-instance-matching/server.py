@@ -104,7 +104,7 @@ class ZMQImageMatcher:
                                     args=(accumulator, src_descriptor, src_keypoints, neighbors_chunks[idx].tolist())
                                 )
                                 worker.start()
-                                worker_array.append(worker_array)
+                                worker_array.append(worker)
                             
                             for wrk in worker_array:
                                 wrk.join()

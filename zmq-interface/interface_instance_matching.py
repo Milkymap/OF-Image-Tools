@@ -10,7 +10,7 @@ from loguru import logger
 from glob import glob 
 
 @click.command()
-@click.option('--size', help='how many image to use for test')
+@click.option('--size', help='how many image to use for test', type=int)
 @click.option('--source', help='path to source dataset')
 @click.option('--server_address', help='address of the remote app', required=True)
 def interface(size, source, server_address):

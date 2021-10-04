@@ -47,6 +47,7 @@ a python implementation of ngt, resnet vectorization and mbr-sift for image dupl
         -e THRESHOLD=0.75
         -e WIDTH=128
         -e HEIGHT=128
+        -e NB_WORKERS=8
         -p host_port:8300
         instance-matching:0.0
 ```
