@@ -151,8 +151,9 @@ def main():
     THRESHOLD= float(getenv('THRESHOLD'))
     WIDTH= int(getenv('WIDTH'))
     HEIGHT = int(getenv('HEIGHT'))
+    NB_WORKERS = int(getenv('NB_WORKERS'))
 
-    server = ZMQImageMatcher(SOURCE, TARGET, SERVER_PORT, THRESHOLD, (WIDTH, HEIGHT))
+    server = ZMQImageMatcher(SOURCE, TARGET, SERVER_PORT, THRESHOLD, (WIDTH, HEIGHT), NB_WORKERS)
     server.start()
 
 if __name__ == '__main__':
