@@ -19,7 +19,12 @@ class ZMQVectorizer:
         self.vectorizer = self.__load_model(models_path, models_name, self.device)
     
     def __load_model(self, path2models, model_name, target_device):
-        model = th.load(path.join(path2models, model_name), map_location=target_device)
+        realpath2model = path.join(path2models, model_name)
+        if not path.isfile(realpath2model):
+            logger.error(f'{realpath2model} is not a valid file')
+            exit(1)
+            
+        model = th.load(realpath2model, map_location=target_device)
         specialized_model = nn.Sequential(*list(model.children())[:-1]).eval()
         
         for prm in specialized_model.parameters():
@@ -50,30 +55,29 @@ class ZMQVectorizer:
                             path2image = path.join(self.images_path, image_name)
 
                             if path.isfile(path2image):
-                                try:
-                                    bgr_image = read_image(path2image)
-                                    tensor_3d = cv2th(bgr_image)
-                                    prepared_tensor_3d = prepare_image(tensor_3d)
-                                    fingerprint = th.squeeze(
-                                        self.vectorizer(prepared_tensor_3d[None, ...])
-                                    ).numpy().tolist()
-                                    status = 1 
-                                except Exception as e:
-                                    logger.error('an error occur during image (reading | vectorization) process :', e)
-                                    fingerprint = []
-                                    status = 0
-                            else:
-                                logger.error(f'{path2image} is not a valid path')
-                                fingerprint = []
-                                status = 0 
+                                bgr_image = read_image(path2image)
+                                tensor_3d = cv2th(bgr_image)
+                                prepared_tensor_3d = prepare_image(tensor_3d)
+                                fingerprint = th.squeeze(
+                                    self.vectorizer(prepared_tensor_3d[None, ...])
+                                ).numpy().tolist()
+                                response = json.dumps({
+                                    'global_status': 1, 
+                                    'error_message': '', 
+                                    'response': {
+                                        'local_status': 1, 
+                                        'fingerprint': fingerprint
+                                    }
+                                }).encode()
                         except Exception as e:
                             logger.error(f'an error {e} occurs during json or path handler ...!')
                     
-                        response = json.dumps({
-                            'status': status, 
-                            'fingerprint': fingerprint 
-                        }).encode()
-
+                            response = json.dumps({
+                                'global_status': 0,
+                                'error_message': f'[{e}]', 
+                                'response': {}
+                            }).encode()
+                        
                         router_socket.send_multipart([remote_address, delimeter, response])
                         logger.success(f'server responded to {remote_address}')
                     # end if incoming pollin events  

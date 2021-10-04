@@ -68,33 +68,43 @@ class ZMQImageMatcher:
                         client_address, _, client_message = router_socket.recv_multipart()
                         try:
                             loaded_message = json.loads(client_message.decode())
+                            
+                            path2candidate = path.join(self.source, loaded_message['candidate'])
+                            path2neighbors = [ path.join(self.target, elm) for elm in loaded_message['neighbors']]
+
+                            src_image = read_image(path2candidate, size=self.shape)
+                            src_keypoints, src_descriptor = self.get_sift(src_image)
+                            src_descriptor = self.turn_sift2mbrsift(src_descriptor)
+
+                            retained = []
+                            for target in tqdm(path2neighbors):
+                                trg_image = read_image(target, size=self.shape)
+                                trg_keypoints, trg_descriptor = self.get_sift(trg_image)
+                                trg_descriptor = self.turn_sift2mbrsift(trg_descriptor)
+                                
+                                matching_weight = self.compare_descriptors(src_descriptor, trg_descriptor)
+                                matching_weight /= (2 * np.maximum(len(src_keypoints), len(trg_keypoints)))
+                                
+                                if matching_weight > 0.1:
+                                    _, target_name = path.split(target)
+                                    retained.append({'image_id': target_name, 'score': matching_weight})
+                            
+                            response = json.dumps({
+                                'global_status': 1,
+                                'error_message': '', 
+                                'response': {
+                                    'local_status':  len(retained) > 0, 
+                                    'duplicated': retained
+                                }
+                            }).encode()
+
                         except Exception as e:
-                            logger.error(f'server can load the request {e}')
-
-                        path2candidate = path.join(self.source, loaded_message['candidate'])
-                        path2neighbors = [ path.join(self.target, elm) for elm in loaded_message['neighbors']]
-
-                        src_image = read_image(path2candidate, size=self.shape)
-                        src_keypoints, src_descriptor = self.get_sift(src_image)
-                        src_descriptor = self.turn_sift2mbrsift(src_descriptor)
-
-                        retained = []
-                        for target in tqdm(path2neighbors):
-                            trg_image = read_image(target, size=self.shape)
-                            trg_keypoints, trg_descriptor = self.get_sift(trg_image)
-                            trg_descriptor = self.turn_sift2mbrsift(trg_descriptor)
-                            
-                            matching_weight = self.compare_descriptors(src_descriptor, trg_descriptor)
-                            matching_weight /= (2 * np.maximum(len(src_keypoints), len(trg_keypoints)))
-                            
-                            if matching_weight > 0.1:
-                                _, target_name = path.split(target)
-                                retained.append({'image_id': target_name, 'score': matching_weight})
-                        
-                        response = json.dumps({
-                            'status':  len(retained) > 0, 
-                            'duplicated': retained
-                        }).encode()
+                            logger.error(f'an error occurs during instance matching {e}')
+                            response = json.dumps({
+                                'global_status':  0,
+                                'error_message': f'[{e}]', 
+                                'response': {}
+                            }).encode()
 
                         router_socket.send_multipart([client_address, b'', response])
                         logger.success(f'server finishs to search duplication for incoming request {loaded_message["candidate"]}')

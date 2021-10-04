@@ -96,14 +96,19 @@ class ZMQNGT:
                             zipped_solutions = list(zip(selected_candidates, distances))
                             mapped_solutions = [ {'path': itm[0], 'score': itm[1]} for itm in zipped_solutions ]
                             response2send = json.dumps({
-                                'status': 1, 
-                                'neighbors': mapped_solutions
+                                'global_status': 1, 
+                                'error_message': '',
+                                'response': {
+                                    'local_status': 1, 
+                                    'neighbors': mapped_solutions
+                                }
                             }).encode()
                         except Exception as e:
                             logger.error(f'an error occurs during request handler {e}')
                             response2send = json.dumps({
-                                'status': 0, 
-                                'neighbors': []
+                                'global_status': 1, 
+                                'error_message': f'[{e}]',
+                                'response': {}
                             }).encode()
                         
                         router_socket.send_multipart([remote_address, b'', response2send])

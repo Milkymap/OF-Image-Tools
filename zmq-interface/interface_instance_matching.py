@@ -31,12 +31,14 @@ def interface(source, server_address):
                 if incoming_events[dealer_socket] == zmq.POLLIN:
                     _, contents = dealer_socket.recv_multipart()
                     decoded_contents = json.loads(contents.decode())
-                    if decoded_contents['status'] == 1:
-                        duplicated = decoded_contents['duplicated']
-                        print(duplicated)
+                    if decoded_contents['global_status'] == 1:
+                        if decoded_contents['response']['local_status']:
+                            duplicated = decoded_contents['response']['duplicated']
+                            print(duplicated)
                     else:
                         print('The server was not able to handle this request')
-            
+                        print(decoded_contents['error_message'])
+                        
             is_ok = input('do you wanna send new request ?')
             if is_ok == 'yes':
                 image_name = input('choose an image name : ')
