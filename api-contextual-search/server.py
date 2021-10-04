@@ -106,7 +106,7 @@ class ZMQNGT:
                         except Exception as e:
                             logger.error(f'an error occurs during request handler {e}')
                             response2send = json.dumps({
-                                'global_status': 1, 
+                                'global_status': 0, 
                                 'error_message': f'[{e}]',
                                 'response': {}
                             }).encode()
