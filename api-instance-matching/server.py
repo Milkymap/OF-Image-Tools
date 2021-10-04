@@ -1,5 +1,6 @@
 import cv2 
 import zmq 
+import time 
 import json 
 import numpy as np 
 import multiprocessing as mp 
@@ -94,7 +95,7 @@ class ZMQImageMatcher:
                             src_keypoints, src_descriptor = self.get_sift(src_image)
                             src_descriptor = self.turn_sift2mbrsift(src_descriptor)
                             
-
+                            begin = time.time()
                             accumulator = mp.Queue()
                             worker_array = []
                             for idx in range(self.nb_workers):
@@ -103,10 +104,11 @@ class ZMQImageMatcher:
                                     args=(accumulator, src_descriptor, src_keypoints, neighbors_chunks[idx].tolist())
                                 )
                                 worker.start()
-                                worker_array[worker_array]
+                                worker_array.append(worker_array)
                             
                             for wrk in worker_array:
                                 wrk.join()
+                            end = time.time()
 
                             retained = []
                             while not accumulator.empty():
@@ -122,7 +124,7 @@ class ZMQImageMatcher:
                                     'duplicated': retained
                                 }
                             }).encode()
-
+                            logger.success(f'server finishs the searching process : ({end - begin} s)')
                         except Exception as e:
                             logger.error(f'an error occurs during instance matching {e}')
                             response = json.dumps({
@@ -132,7 +134,7 @@ class ZMQImageMatcher:
                             }).encode()
 
                         router_socket.send_multipart([client_address, b'', response])
-                        logger.success(f'server finishs to search duplication for incoming request {loaded_message["candidate"]}')
+                        
             # end loop 
         except KeyboardInterrupt as e:
             pass 

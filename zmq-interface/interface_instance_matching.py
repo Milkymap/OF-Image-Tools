@@ -10,9 +10,10 @@ from loguru import logger
 from glob import glob 
 
 @click.command()
+@click.option('--size', help='how many image to use for test')
 @click.option('--source', help='path to source dataset')
 @click.option('--server_address', help='address of the remote app', required=True)
-def interface(source, server_address):
+def interface(size, source, server_address):
     try:
         ctx = zmq.Context()
         
@@ -22,7 +23,7 @@ def interface(source, server_address):
         dealer_controller = zmq.Poller()
         dealer_controller.register(dealer_socket, zmq.POLLIN)
 
-        neighbors = [ path.split(elm)[-1] for elm in glob(path.join(source, '*.jpg')) ]
+        neighbors = [ path.split(elm)[-1] for elm in glob(path.join(source, '*.jpg'))[:size] ]
 
         keep_interface = True 
         while keep_interface:
