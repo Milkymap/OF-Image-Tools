@@ -51,7 +51,7 @@ class ZMQVectorizer:
                         remote_address, delimeter, message = router_socket.recv_multipart()
                         try:
                             json_contents = json.loads(message.decode())
-                            image_name = json_contents['image_name']
+                            image_name = json_contents['relative_path']
                             path2image = path.join(self.images_path, image_name)
 
                             if path.isfile(path2image):

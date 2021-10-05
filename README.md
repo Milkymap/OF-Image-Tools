@@ -7,6 +7,26 @@ a python implementation of ngt, resnet vectorization and mbr-sift for image dupl
 * [api-instance-matching]
 
 # api-image-encoder
+* json schema 
+    * input schema 
+        ```json
+            {
+                'request_id': integer,
+                'relative_path': relative path to the source directory 
+            }
+        ```
+    * output schema
+        ```json
+            {
+                'global_status': 0 | 1,
+                'response': {
+                    'local_status': 0 | 1, 
+                    'request_id': integer, 
+                    'fingerprint': [Float]
+                }
+            }
+        ```
+
 ```bash
     docker build -t image-encoder:0.0 -f Dockerfile .
     docker run 
@@ -21,6 +41,31 @@ a python implementation of ngt, resnet vectorization and mbr-sift for image dupl
 ``` 
 
 # api-contextual-search
+* json schema 
+    * input schema 
+        ```json
+            {
+                'nb_neighbors': integer,
+                'vec_features': fingerprint => [Float]  
+            }
+        ```
+    * output schema
+        ```json
+            {
+                'global_status': 0 | 1,
+                'error_message': 'some message if an error was catched by the server',
+                'response': {
+                    'local_status': 0 | 1, 
+                    'neighbors': [
+                        {
+                            'relative_path': '...', 
+                            'score' : float between [0, 1]
+                        }
+                    ]
+                }
+            }
+        ```
+
 ```bash
     docker build -t contextual-search:0.0 -f Dockerfile .
     docker run 
@@ -36,6 +81,29 @@ a python implementation of ngt, resnet vectorization and mbr-sift for image dupl
 ```
 
 # api-instance-matching
+* json schema 
+    * input schema 
+        ```json
+            {
+                'candidate': 'input image that we wana check if it is a duplication',
+                'neighbors': array of neighbors's paths   
+            }
+        ```
+    * output schema
+        ```json
+            {
+                'global_status': 0 | 1,
+                'error_message': 'some message if an error was catched by the server',
+                'response': {
+                    'local_status': 0 | 1, 
+                    'duplicated': [{
+                        'relative_path': 'relative path to duplicated image', 
+                        'score': 'mbr-sift score'
+                    }]
+                }
+            }
+        ```
+
 ```bash
     docker build -t instance-matching:0.0 -f Dockerfile .
     docker run

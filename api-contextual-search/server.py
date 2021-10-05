@@ -102,7 +102,7 @@ class ZMQNGT:
                                 positions, distances = list(zip(*ngt_response))
                                 selected_candidates = op.itemgetter(*positions)(self.idx2img_id)    
                                 zipped_solutions = list(zip(selected_candidates, distances))
-                                mapped_solutions = [ {'path': itm[0], 'score': itm[1]} for itm in zipped_solutions ]
+                                mapped_solutions = [ {'relative_path': itm[0], 'score': itm[1]} for itm in zipped_solutions ]
                                 response2send = json.dumps({
                                     'global_status': 1, 
                                     'error_message': '',

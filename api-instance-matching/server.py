@@ -63,8 +63,8 @@ class ZMQImageMatcher:
             matching_weight /= (2 * np.maximum(len(src_keypoints), len(trg_keypoints)))
             
             if matching_weight > 0.1:
-                _, target_name = path.split(target)
-                accumulator.put({'image_id': target_name, 'score': matching_weight})
+                relative_path = target.replace(self.target, '')
+                accumulator.put({'relative_path': relative_path, 'score': matching_weight})
         # end mbr-sift loop processing 
 
     def start(self):
