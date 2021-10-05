@@ -59,8 +59,8 @@ class ZMQVectorizer:
                                 tensor_3d = cv2th(bgr_image)
                                 prepared_tensor_3d = prepare_image(tensor_3d)
                                 fingerprint = th.squeeze(
-                                    self.vectorizer(prepared_tensor_3d[None, ...])
-                                ).numpy().tolist()
+                                    self.vectorizer(prepared_tensor_3d[None, ...].to(self.device))
+                                ).cpu().numpy().tolist()
                                 response = json.dumps({
                                     'global_status': 1, 
                                     'error_message': '', 
