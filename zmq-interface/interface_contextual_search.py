@@ -29,9 +29,8 @@ def interface(server_address):
                     _, contents = dealer_socket.recv_multipart()
                     decoded_contents = json.loads(contents.decode())
                     if decoded_contents['global_status'] == 1:
-                        if decoded_contents['response']['local_status'] == 1:
-                            response = decoded_contents['response']['neighbors']
-                            print(response)
+                        response = decoded_contents['response']['neighbors']
+                        print(response)
                     else:
                         print('The server was not able to handle this request')
                         print(decoded_contents['error_message'])

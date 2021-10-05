@@ -33,9 +33,8 @@ def interface(size, source, server_address):
                     _, contents = dealer_socket.recv_multipart()
                     decoded_contents = json.loads(contents.decode())
                     if decoded_contents['global_status'] == 1:
-                        if decoded_contents['response']['local_status']:
-                            duplicated = decoded_contents['response']['duplicated']
-                            print(duplicated)
+                        duplicated = decoded_contents['response']['duplicated']
+                        print(duplicated)
                     else:
                         print('The server was not able to handle this request')
                         print(decoded_contents['error_message'])

@@ -34,9 +34,8 @@ def interface(source, server_address):
                     _, contents = dealer_socket.recv_multipart()
                     decoded_contents = json.loads(contents.decode())
                     if decoded_contents['global_status'] == 1:
-                        if decoded_contents['response']['local_status'] == 1:
-                            fingerprint = np.asarray(decoded_contents['response']['fingerprint'])
-                            print(fingerprint[:30], fingerprint.shape)
+                        fingerprint = np.asarray(decoded_contents['response']['fingerprint'])
+                        print(fingerprint[:30], fingerprint.shape)
                     else:
                         print('The server was not able to handle this request')
                         print(decoded_contents['error_message'])
@@ -45,7 +44,7 @@ def interface(source, server_address):
             _, image_name = path.split(current_path)
             request2send = json.dumps({
                 'request_id': cursor,
-                'image_name': image_name
+                'relative_path': image_name
             }).encode()
 
             dealer_socket.send_multipart([b'', request2send])
