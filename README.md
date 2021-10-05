@@ -11,18 +11,18 @@ a python implementation of ngt, resnet vectorization and mbr-sift for image dupl
     * input schema 
         ```json
             {
-                'request_id': integer,
-                'relative_path': relative path to the source directory 
+                "request_id": "integer",
+                "relative_path": "relative path to the source directory" 
             }
         ```
     * output schema
         ```json
             {
-                'global_status': 0 | 1,
-                'response': {
-                    'local_status': 0 | 1, 
-                    'request_id': integer, 
-                    'fingerprint': [Float]
+                "global_status": 0 | 1,
+                "response": {
+                    "local_status": 0 | 1, 
+                    "request_id": integer, 
+                    "fingerprint": [Float]
                 }
             }
         ```
@@ -45,21 +45,21 @@ a python implementation of ngt, resnet vectorization and mbr-sift for image dupl
     * input schema 
         ```json
             {
-                'nb_neighbors': integer,
-                'vec_features': fingerprint => [Float]  
+                "nb_neighbors": "integer",
+                "vec_features": "fingerprint => [Float]"  
             }
         ```
     * output schema
         ```json
             {
-                'global_status': 0 | 1,
-                'error_message': 'some message if an error was catched by the server',
-                'response': {
-                    'local_status': 0 | 1, 
-                    'neighbors': [
+                "global_status": 0 | 1,
+                "error_message": "some message if an error was catched by the server",
+                "response": {
+                    "local_status": 0 | 1, 
+                    "neighbors": [
                         {
-                            'relative_path': '...', 
-                            'score' : float between [0, 1]
+                            "relative_path": "...", 
+                            "score" : "float between [0, 1]"
                         }
                     ]
                 }
@@ -85,20 +85,20 @@ a python implementation of ngt, resnet vectorization and mbr-sift for image dupl
     * input schema 
         ```json
             {
-                'candidate': 'input image that we wana check if it is a duplication',
-                'neighbors': array of neighbors's paths   
+                "candidate": "input image that we wana check if it is a duplication",
+                "neighbors": "array of neighbors's paths"   
             }
         ```
     * output schema
         ```json
             {
-                'global_status': 0 | 1,
-                'error_message': 'some message if an error was catched by the server',
-                'response': {
-                    'local_status': 0 | 1, 
-                    'duplicated': [{
-                        'relative_path': 'relative path to duplicated image', 
-                        'score': 'mbr-sift score'
+                "global_status": 0 | 1,
+                "error_message": "some message if an error was catched by the server",
+                "response": {
+                    "local_status": 0 | 1, 
+                    "duplicated": [{
+                        "relative_path": "relative path to duplicated image", 
+                        "score": "mbr-sift score between 0 and 1"
                     }]
                 }
             }
