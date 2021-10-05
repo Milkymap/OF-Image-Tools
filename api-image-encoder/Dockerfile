@@ -16,8 +16,6 @@ RUN apt-get update --fix-missing && \
 RUN useradd --gid root --create-home solver 
 WORKDIR /home/solver
 
-COPY . ./
-
 # define new virutal environment 
 ENV VIRTUAL_ENV=/opt/venv
 RUN chmod -R g+rwx /home/solver && \
@@ -26,6 +24,8 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # upgrade and install pip 
 RUN pip install --upgrade pip && pip install loguru pyzmq opencv-python tqdm  
+
+COPY . ./
 
 # usefull environments 
 ENV MODELS_PATH='models/'
