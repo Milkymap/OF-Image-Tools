@@ -19,6 +19,7 @@ a python implementation of ngt, resnet vectorization and mbr-sift for image dupl
         ```json
             {
                 "global_status": "0 | 1",
+                "error_message": "some message if an error was catched by the server",
                 "response": {
                     "request_id": "integer", 
                     "fingerprint": "List[Float]"
