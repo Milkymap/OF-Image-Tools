@@ -65,7 +65,6 @@ class ZMQVectorizer:
                                     'global_status': 1, 
                                     'error_message': '', 
                                     'response': {
-                                        'local_status': 1, 
                                         'request_id': json_contents['request_id'],
                                         'fingerprint': fingerprint
                                     }

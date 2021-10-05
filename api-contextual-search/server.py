@@ -107,7 +107,6 @@ class ZMQNGT:
                                     'global_status': 1, 
                                     'error_message': '',
                                     'response': {
-                                        'local_status': 1, 
                                         'neighbors': mapped_solutions
                                     }
                                 }).encode()

@@ -120,7 +120,6 @@ class ZMQImageMatcher:
                                 'global_status': 1,
                                 'error_message': '', 
                                 'response': {
-                                    'local_status':  len(retained) > 0, 
                                     'duplicated': retained
                                 }
                             }).encode()
