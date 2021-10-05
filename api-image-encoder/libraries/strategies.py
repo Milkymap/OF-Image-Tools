@@ -2,6 +2,7 @@ import cv2
 import numpy as np 
 import torch as th
 
+from PIL import Image 
 from torchvision import transforms as T 
 
 def th2cv(th_image):
@@ -12,8 +13,12 @@ def cv2th(cv_image):
     blue, green, red = cv2.split(cv_image)
     return th.as_tensor(np.stack([red, green, blue]))
 
-def read_image(path2image):
-    cv_image = cv2.imread(path2image, cv2.IMREAD_COLOR)
+
+def read_image(path2image, size=None):
+    pl_image = Image.open(path2image).convert('RGB')
+    cv_image = cv2.cvtColor(np.array(pl_image), cv2.COLOR_RGB2BGR)
+    if size is not None:
+        return cv2.resize(cv_image, size, interpolation=cv2.INTER_CUBIC)
     return cv_image
 
 def save_image(cv_image, path2location):

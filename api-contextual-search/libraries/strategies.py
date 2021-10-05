@@ -3,6 +3,7 @@ import numpy as np
 import torch as th
 
 from torchvision import transforms as T 
+from PIL import Image 
 
 from os import path
 from glob import glob 
@@ -16,7 +17,8 @@ def cv2th(cv_image):
     return th.as_tensor(np.stack([red, green, blue]))
 
 def read_image(path2image, size=None):
-    cv_image = cv2.imread(path2image, cv2.IMREAD_COLOR)
+    pl_image = Image.open(path2image).convert('RGB')
+    cv_image = cv2.cvtColor(np.array(pl_image), cv2.COLOR_RGB2BGR)
     if size is not None:
         return cv2.resize(cv_image, size, interpolation=cv2.INTER_CUBIC)
     return cv_image
